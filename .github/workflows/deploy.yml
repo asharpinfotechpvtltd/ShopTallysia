@@ -35,7 +35,7 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: self-hosted    # your EC2 runner
+    runs-on: self-hosted   # EC2 runner
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
@@ -47,9 +47,9 @@ jobs:
         shell: powershell
         run: |
           $sitePath = "C:\inetpub\wwwroot\tallysiaenergy"
-          $pool     = "tallysiaenergy"   # exact IIS app pool name
+          $pool     = "tallysiaenergy"   # exact IIS App Pool name
 
-          if (!(Test-Path $sitePath)) { New-Item -ItemType Directory -Path $sitePath | Out-Null }
+          if (!(Test-Path $sitePath)) { New-Item -ItemType Directory -Path $sitePath -Force | Out-Null }
           New-Item "$sitePath\app_offline.htm" -ItemType File -Force | Out-Null
 
           Import-Module WebAdministration
@@ -65,11 +65,15 @@ jobs:
       - name: Backup current
         shell: powershell
         run: |
-          $src = "C:\inetpub\wwwroot\tallysiaenergy"
-          $dst = "C:\deploy\backups\$(Get-Date -f yyyyMMdd_HHmmss)"
-          if (!(Test-Path $dst)) { New-Item -ItemType Directory -Path $dst | Out-Null }
+          $src  = "C:\inetpub\wwwroot\tallysiaenergy"
+          $base = "C:\deploy\backups"
+          if (!(Test-Path $base)) { New-Item -ItemType Directory -Path $base -Force | Out-Null }
+          $dst  = Join-Path $base (Get-Date -f yyyyMMdd_HHmmss)
+
+          if (!(Test-Path $dst)) { New-Item -ItemType Directory -Path $dst -Force | Out-Null }
           robocopy $src $dst /MIR /NFL /NDL /NJH /NJS /NP
           $code = $LASTEXITCODE
+          Write-Host "Robocopy (backup) exit code: $code"
           if ($code -gt 3) { throw "Backup robocopy failed with exit code $code" }
 
       - name: Deploy to inetpub
@@ -77,8 +81,10 @@ jobs:
         run: |
           $src = "C:\deploy\publish"
           $dst = "C:\inetpub\wwwroot\tallysiaenergy"
+          if (!(Test-Path $dst)) { New-Item -ItemType Directory -Path $dst -Force | Out-Null }
           robocopy $src $dst /MIR /NFL /NDL /NJH /NJS /NP
           $code = $LASTEXITCODE
+          Write-Host "Robocopy (deploy) exit code: $code"
           if ($code -gt 3) { throw "Deploy robocopy failed with exit code $code" }
 
       - name: Start site & warm-up (safe)
