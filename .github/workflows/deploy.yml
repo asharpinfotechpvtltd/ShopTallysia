@@ -3,8 +3,8 @@ name: Build and Deploy Tallysia
 on:
   push:
     branches:
-      - masterbranch      # Tumhari branch ka naam
-  workflow_dispatch:       # Manual run ka option
+      - masterbranch
+  workflow_dispatch:
 
 jobs:
   build:
@@ -18,14 +18,18 @@ jobs:
         with:
           dotnet-version: 9.0.x
 
-      - name: Restore dependencies
-        run: dotnet restore
+      - name: Print SDK info
+        run: dotnet --info
 
-      - name: Build project (ignore warnings)
-        run: dotnet build --no-restore -warnaserror- --configuration Release
+      # 👉 सिर्फ WEB PROJECT restore/build/publish
+      - name: Restore (web project only)
+        run: dotnet restore ./EcommerceTelysia.csproj
+
+      - name: Build project (warnings ≠ errors)
+        run: dotnet build ./EcommerceTelysia.csproj --configuration Release --no-restore -warnaserror-
 
       - name: Publish project
-        run: dotnet publish --no-build --configuration Release --output ./publish
+        run: dotnet publish ./EcommerceTelysia.csproj --configuration Release --no-build --output ./publish -warnaserror-
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
