@@ -1,0 +1,54 @@
+﻿@page
+@model EcommerceTelysia.Areas.Dashboard.Pages.DamagedProductDetails.IndexModel
+
+@{
+    ViewData["Title"] = "Damaged Products";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-danger">Damaged Products</h2>
+        <a asp-page="Create" class="btn btn-primary">➕ Report New Damage</a>
+    </div>
+
+    <div class="alert alert-warning d-flex justify-content-between">
+        <span><strong>Total Damaged Reports:</strong> @Model.DamagedProducts.Count()</span>
+        <i class="fas fa-box-open fa-lg text-dark"></i>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="thead-dark">
+                <tr>
+                   
+                    <th>Product Name</th>
+                    <th>Damaged Qty</th>
+                  
+                    <th>Warehouse</th>
+               
+                    <th>Reported On</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.DamagedProducts)
+                {
+                    <tr>
+                       
+                        <td>@item.ProductName</td>
+                        <td>@item.DamagedQuantity</td>
+                     
+                        <td>@item.TblWarehouseMaster?.WarehouseName</td>
+                      
+                        <td>@item.ReportedOn.ToString("dd-MMM-yyyy")</td>
+                        <td>
+                            <a asp-page="./Edit" asp-route-id="@item.DamageReportId" class="btn btn-sm btn-warning">✏️</a>
+                            <a asp-page="./Details" asp-route-id="@item.DamageReportId" class="btn btn-sm btn-info">🔍</a>
+                            <a asp-page="./Delete" asp-route-id="@item.DamageReportId" class="btn btn-sm btn-danger">🗑️</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

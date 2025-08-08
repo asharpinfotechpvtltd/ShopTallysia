@@ -1,0 +1,161 @@
+﻿@page
+@model EcommerceTelysia.Pages.CartModel
+@using Microsoft.AspNetCore.Http
+
+@{
+    ViewData["Title"] = "Cart";
+}
+@if (TempData["CouponMessage"] != null)
+{
+    <div class="alert alert-info">@TempData["CouponMessage"]</div>
+}
+
+<div class="it-breadcrumb-area fix p-relative" data-background="assets/img/breadcrumb/breadcrumb-bg.jpg">
+    <div class="it-breadcrumb-shape-1">
+        <img src="assets/img/breadcrumb/breadcrumb-shape.png" alt="">
+    </div>
+    <div class="it-breadcrumb-transparent-text">
+        <h3 class="it-breadcrumb-transparent-title">Solvora</h3>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="it-breadcrumb-content">
+                    <div class="it-breadcrumb-title-box mb-25 z-index-3">
+                        <h3 class="it-breadcrumb-title text-white">Cart</h3>
+                    </div>
+                    <div class="it-breadcrumb-list-wrap">
+                        <div class="it-breadcrumb-list z-index-3">
+                            <span><a asp-page="/Index">Home</a></span>
+                            <span class="dvdr">//</span>
+                            <span><b>Cart Page</b></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="cart-area pt-120 pb-120">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                @if (Model.Carts != null && Model.Carts.Count > 0)
+                {
+                    <form method="post">
+                        <div class="table-content table-responsive wow tpfadeUp animated" data-wow-duration=".9s" data-wow-delay=".3s">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th class="product-thumbnail">Images</th>
+                                        <th class="cart-product-name">Product</th>
+                                        <th class="product-price">Unit Price</th>
+                                        <th class="product-quantity">Quantity</th>
+                                        <th class="product-subtotal">Total</th>
+                                        <th class="product-remove">Remove</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Carts)
+                                    {
+                                        <tr>
+                                            <td class="product-thumbnail">
+                                                <img src="@item.Image" alt="@item.ProductName" style="width: 80px;" />
+                                            </td>
+                                            <td class="product-name">@item.ProductName</td>
+                                            <td class="product-price"><span class="amount">₹@item.Price.ToString("N2")</span></td>
+                                            <td class="product-quantity">
+                                                <span class="cart-minus" onclick="updateQty('@item.ProductId', @item.Qty - 1)">-</span>
+                                                <input class="cart-input" type="text" value="@item.Qty" readonly />
+                                                <span class="cart-plus" onclick="updateQty('@item.ProductId', @item.Qty + 1)">+</span>
+                                            </td>
+
+                                            <td class="product-subtotal">
+                                                <span class="amount">₹@(item.Price * item.Qty)</span>
+                                            </td>
+                                            <td class="product-remove">
+                                                <a asp-page-handler="Delete" asp-route-id="@item.ProductId" title="Remove">
+                                                    <i class="fa fa-times"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="coupon-all">
+                                    <div class="coupon">
+                                        <input id="coupon_code" class="input-text" placeholder="Coupon code" type="text" />
+                                        <button type="button" class="it-btn-green yellow-bg" onclick="submitCoupon()">
+                                            <span>Apply coupon</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row justify-content-end">
+                            <div class="col-md-5">
+                                <div class="cart-page-total">
+                                    <h2>Cart totals</h2>
+                                    <ul class="mb-20">
+                                        <li>Subtotal <span>₹@Model.Total</span></li>
+                                        @if (Model.Shipping > 0)
+                                        {
+                                            <li>Shipping <span>₹@Model.Shipping</span></li>
+                                        }
+                                        @if (Model.HttpContext.Session.GetString("AppliedCoupon") == "True")
+
+                                        {
+                                            <li>Discount <span>- ₹@Model.DiscountAmount.ToString("N2")</span></li>
+                                        }
+                                        <li>Total <span>₹@Model.Subtotal.ToString("N2")</span></li>
+                                    </ul>
+                                    <a class="it-btn-green yellow-bg" asp-page="/Checkout">
+                                        <span>Proceed to checkout</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                }
+                else
+                {
+                    <div class="alert alert-warning text-center">Your cart is empty.</div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+<form id="qtyForm" method="post" asp-page-handler="UpdateQuantity">
+    <input type="hidden" name="productID" id="formProductId" />
+    <input type="hidden" name="quantity" id="formQuantity" />
+</form>
+<form method="post" asp-page-handler="CouponCode" id="couponForm" style="display:none;">
+    <input type="hidden" name="coupon_code" id="hiddenCouponInput" />
+</form>
+
+<script>
+    function updateQty(productId, qty) {
+        if (qty < 1) return; // prevent qty going below 1
+        document.getElementById('formProductId').value = productId;
+        document.getElementById('formQuantity').value = qty;
+        document.getElementById('qtyForm').submit();
+    }
+</script>
+<script>
+    function submitCoupon() {
+        const code = document.getElementById("coupon_code").value;
+        if (!code || code.trim() === "") {
+            alert("Please enter a coupon code.");
+            return;
+        }
+
+        document.getElementById("hiddenCouponInput").value = code;
+        document.getElementById("couponForm").submit();
+    }
+</script>

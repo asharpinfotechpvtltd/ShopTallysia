@@ -1,0 +1,39 @@
+﻿@page
+@model EcommerceTelysia.Areas.Dashboard.Pages.Inventory_Details.DetailsModel
+
+@{
+    ViewData["Title"] = "Product Inventory Details";
+}
+
+<h2>Inventory Allocation Details</h2>
+<hr />
+<h4>Product: <strong>@Model.ProductName</strong></h4>
+
+@if (Model.WarehouseQuantities.Any())
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Warehouse</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.WarehouseQuantities)
+            {
+                <tr>
+                    <td>@item.WarehouseName</td>
+                    <td>@item.Quantity</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No warehouse allocations found for this product.</p>
+}
+
+<div>
+    <a asp-page="./Index" class="btn btn-secondary">Back to List</a>
+</div>

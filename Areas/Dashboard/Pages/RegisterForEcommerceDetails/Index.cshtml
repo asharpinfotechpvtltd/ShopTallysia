@@ -1,0 +1,52 @@
+﻿@page
+@model EcommerceTelysia.Areas.Dashboard.Pages.RegisterForEcommerceDetails.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.RegisterForEcommerce[0].Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RegisterForEcommerce[0].Mobile)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RegisterForEcommerce[0].Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RegisterForEcommerce[0].Password)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RegisterForEcommerce[0].RegistrationNumber)
+            </th>
+         
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.RegisterForEcommerce) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Mobile)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Password)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RegistrationNumber)
+            </td>
+         
+        </tr>
+}
+    </tbody>
+</table>

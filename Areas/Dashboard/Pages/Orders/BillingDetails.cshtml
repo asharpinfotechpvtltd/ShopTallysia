@@ -1,0 +1,91 @@
+﻿@page
+@model EcommerceTelysia.Areas.Dashboard.Pages.Orders.BillingDetailsModel
+
+<h2 class="text-center mb-4">🧾 Order List</h2>
+
+@if (Model.Orders != null && Model.Orders.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered text-center">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Order ID</th>
+                    <th>Date</th>
+                    <th>Coupon Code</th>
+                    <th>Email ID</th>
+                    <th>Status</th>
+                    <th>Total (₹)</th>
+                    <th>Payment From</th>
+                    <th>Payment Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.Orders)
+                {
+                    <tr>
+                        <td>
+                            <a asp-page="./OrderDetails" asp-route-orderid="@order.Orderid" class="btn btn-link font-weight-bold">
+                                #@order.Orderid
+                            </a>
+                        </td>
+                        <td>@order.Date.ToString("dd-MMM-yyyy")</td>
+                        <td>@order.CouponCodeapplied</td>
+                        <td>@order.Emailid</td>
+                        <td>
+                            <select class="form-control status-dropdown" data-order-id="@order.Orderid" data-field="Status">
+                                <option value="Pending" selected="@(order.Status == "Pending" ? "selected" : null)">Pending</option>
+                                <option value="Completed" selected="@(order.Status == "Completed" ? "selected" : null)">Completed</option>
+                                <option value="Dispatched" selected="@(order.Status == "Dispatched" ? "selected" : null)">Dispatched</option>
+                            </select>
+                        </td>
+                        <td>₹@order.TotalAmount</td>
+                        <td>@order.PaymentFrom</td>
+                        <td>
+                            <select class="form-control payment-status-dropdown" data-order-id="@order.Orderid" data-field="PaymentStatus">
+                                <option value="Pending" selected="@(order.PaymentStatus == "Pending" ? "selected" : null)">Pending</option>
+                                <option value="Completed" selected="@(order.PaymentStatus == "Completed" ? "selected" : null)">Completed</option>
+                            </select>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <form id="orderForm">
+        @Html.AntiForgeryToken()
+    </form>
+}
+else
+{
+    <div class="alert alert-warning text-center">No orders available.</div>
+}
+
+@section Scripts {
+    <script>
+        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+        document.querySelectorAll('.status-dropdown, .payment-status-dropdown').forEach(dropdown => {
+            dropdown.addEventListener('change', function () {
+                const orderId = this.getAttribute('data-order-id');
+                const field = this.getAttribute('data-field');
+                const value = this.value;
+
+                fetch('@Url.Page("/Orders/BillingDetails", "UpdateStatus")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token
+                    },
+                    body: JSON.stringify({ orderId: orderId, field: field, value: value })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        alert('❌ Failed to update status. Please try again.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    </script>
+}

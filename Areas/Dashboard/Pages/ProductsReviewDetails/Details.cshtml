@@ -1,0 +1,55 @@
+﻿@page
+@model EcommerceTelysia.Areas.Dashboard.Pages.ProductsReviewDetails.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Reviews</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Reviews.comment)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Reviews.comment)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Reviews.email)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Reviews.email)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Reviews.Date)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Reviews.Date)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Reviews.review)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Reviews.review)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Reviews.ProductId)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Reviews.ProductId)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Reviews.Isviewable)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Reviews.Isviewable)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.Reviews.Id">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>

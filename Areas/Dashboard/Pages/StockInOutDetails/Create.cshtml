@@ -1,0 +1,76 @@
+﻿@page
+@model EcommerceTelysia.Areas.Dashboard.Pages.StockInOutDetails.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>StockInOut</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+          
+            @if (TempData["Message"] != null)
+            {
+                <div class="alert alert-warning">
+                    @TempData["Message"]
+                </div>
+            }
+
+            <div class="form-group">
+                <label asp-for="StockInOut.ProductId" class="control-label"></label>
+                <select asp-for="StockInOut.ProductId" class="form-control" asp-items="ViewBag.ProductId"></select>
+            </div>
+
+
+
+            <div class="form-group">
+                <label asp-for="StockInOut.Type" class="control-label"></label>
+                <select asp-for="StockInOut.Type" class="form-control">
+                    <option value="">Select Type</option>
+                    <option value="Added">Added</option>
+                    <option value="Sold">Sold</option>
+                </select>
+                <span asp-validation-for="StockInOut.Type" class="text-danger"></span>
+            </div>
+
+
+            <div class="form-group">
+                <label asp-for="StockInOut.Quantity" class="control-label"></label>
+                <input asp-for="StockInOut.Quantity" class="form-control" />
+                <span asp-validation-for="StockInOut.Quantity" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="StockInOut.ActionDate" class="control-label"></label>
+                <input asp-for="StockInOut.ActionDate" class="form-control" />
+                <span asp-validation-for="StockInOut.ActionDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="StockInOut.WarehouseId" class="control-label"></label>
+                <select asp-for="StockInOut.WarehouseId" class="form-control" asp-items="ViewBag.WarehouseId"></select>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

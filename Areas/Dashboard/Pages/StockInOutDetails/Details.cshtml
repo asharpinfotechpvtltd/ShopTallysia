@@ -1,0 +1,55 @@
+﻿@page
+@model EcommerceTelysia.Areas.Dashboard.Pages.StockInOutDetails.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>StockInOut</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.StockInOut.SKU)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.StockInOut.SKU)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.StockInOut.Type)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.StockInOut.Type)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.StockInOut.Quantity)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.StockInOut.Quantity)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.StockInOut.ActionDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.StockInOut.ActionDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.StockInOut.TblWarehouseMaster)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.StockInOut.TblWarehouseMaster.WarehouseId)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.StockInOut.Products)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.StockInOut.Products.Id)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.StockInOut.LogId">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>

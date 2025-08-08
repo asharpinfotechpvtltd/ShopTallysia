@@ -1,0 +1,125 @@
+﻿@page
+@model EcommerceTelysia.Pages.UserProfileModel
+@{
+  
+    var cartUrl = "/Cart";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+<style>
+    .user-profile-container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .user-section {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .section-header {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .section-header a {
+            font-size: 14px;
+            color: #0d6efd;
+            text-decoration: none;
+        }
+
+    table.order-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+
+    .order-table th,
+    .order-table td {
+        padding: 10px 12px;
+        border: 1px solid #dee2e6;
+        text-align: left;
+        font-size: 14px;
+    }
+
+    .order-table th {
+        background-color: #e9ecef;
+        font-weight: 600;
+    }
+
+    .cart-button {
+        display: inline-block;
+        padding: 10px 16px;
+        background-color: #0d6efd;
+        color: white;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 15px;
+        margin-top: 10px;
+    }
+
+        .cart-button:hover {
+            background-color: #084298;
+        }
+</style>
+
+<div class="user-profile-container">
+
+    <!-- Section 1: Your Orders with Table -->
+    <div class="user-section">
+        <div class="section-header">
+            <span><i class="fas fa-box"></i> Your Orders</span>
+        </div>
+        <table class="order-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Mode</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.CustomerOrderDetails != null && Model.CustomerOrderDetails.Any())
+                {
+                    foreach (var item in Model.CustomerOrderDetails)
+                    {
+                        <tr>
+                            <td>@item.ProductId</td>
+                            <td>@item.Qty</td>
+                            <td>@Model.Orders.PaymentFrom</td>
+                            <td>Pending</td>
+                            <td>@Model.Orders.Date.ToString("dd-MMM-yyyy")</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" style="text-align:center;">No orders available.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+
+    <!-- Section 2: Cart Button -->
+    <div class="user-section">
+        <div class="section-header">
+            <span><i class="fas fa-shopping-cart"></i> Your Cart</span>
+        </div>
+
+        <a href="@cartUrl" class="cart-button">Go to Cart</a>
+    </div>
+
+</div>

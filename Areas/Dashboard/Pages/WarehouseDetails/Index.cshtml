@@ -1,0 +1,61 @@
+﻿@page
+@model EcommerceTelysia.Areas.Dashboard.Pages.WarehouseDetails.IndexModel
+
+@{
+    ViewData["Title"] = "Warehouse List";
+}
+
+<div class="container mt-4">
+    <!-- Title and Total Warehouse Count -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="text-primary mb-0">Warehouse List</h1>
+        <span class="badge bg-success p-2">
+            <strong>Total Warehouses:</strong> @Model.WareHouse.Count()
+        </span>
+    </div>
+
+    <!-- Create New Warehouse Button -->
+    <p>
+        <a asp-page="Create" class="btn btn-success">
+            <i class="fas fa-plus-circle"></i> Create New Warehouse
+        </a>
+    </p>
+
+    <!-- Warehouse Table -->
+    <table class="table table-bordered table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.WareHouse[0].WarehouseName)</th>
+                <th>@Html.DisplayNameFor(model => model.WareHouse[0].Location)</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.WareHouse)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.WarehouseName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Location)</td>
+                    <td>
+                        <!-- Edit Button -->
+                        <a asp-page="./Edit" asp-route-id="@item.WarehouseId" class="btn btn-sm btn-warning" title="Edit Warehouse">
+                            <i class="fas fa-pencil-alt"></i> Edit
+                        </a>
+                        <!-- Details Button -->
+                        <a asp-page="./Details" asp-route-id="@item.WarehouseId" class="btn btn-sm btn-info" title="View Details">
+                            <i class="fas fa-info-circle"></i> Details
+                        </a>
+                        <!-- Delete Button with Confirmation -->
+                        <a asp-page="./Delete" asp-route-id="@item.WarehouseId" class="btn btn-sm btn-danger" title="Delete Warehouse" onclick="return confirm('Are you sure you want to delete this warehouse?');">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+}

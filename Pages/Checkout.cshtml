@@ -1,0 +1,364 @@
+﻿@page
+@model EcommerceTelysia.Pages.CheckoutModel
+
+<style>
+    /* Fix form-check alignment and spacing */
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        font-size: 14px;
+    }
+
+    .form-check-input {
+        width: 16px;
+        height: 16px;
+        margin: 0;
+        accent-color: #f46a79;
+        flex-shrink: 0;
+    }
+
+    .form-check-label {
+        margin: 0;
+        font-weight: 500;
+        color: #333;
+    }
+
+    /* Adjust for mobile */
+    @@media (max-width: 576px) {
+        .form-check
+
+    {
+        font-size: 13px;
+        gap: 6px;
+    }
+
+    .form-check-input {
+        width: 14px;
+        height: 14px;
+    }
+
+    }
+
+    /* Remove extra gap if any element causes overflow */
+    .checkout__summary-wrapper {
+        word-break: break-word;
+        overflow-x: hidden;
+    }
+
+    /* Prevent huge check icon issue */
+    .form-check-input[type="checkbox"]:checked {
+        background-size: 75% 75%;
+    }
+
+    /* Optional: better spacing for total summary */
+    .checkout__summary-list,
+    .checkout__bottom {
+        font-size: 15px;
+    }
+
+    .checkbox_custom{padding:0px !important;border-radius:0px !important}
+</style>
+
+
+<div class="checkout__area pt-95 pb-120">
+    <div class="container">
+        <form asp-page-handler="PlaceOrder" id="forms" method="post">
+            <input type="hidden" id="paymentMethod" name="paymentMethod" value="" />
+            <div class="row">
+                <!-- Billing Address -->
+                <div class="col-lg-8">
+                    <div class="checkout__wrapper pb-10 wow tpfadeUp" data-wow-duration=".9s" data-wow-delay=".5s">
+                        <span>Billing Details:</span>
+                        <div class="checkout__content">
+                            <div class="row">
+                                <div class="col-xl-6 col-md-6 col-sm-6 col-12 checkout__input">
+                                    <input asp-for="Detail.FullName" placeholder="Full Name*" required />
+                                    <span asp-validation-for="Detail.FullName" class="text-danger"></span>
+                                </div>
+                                <div class="col-xl-6 col-md-6 col-sm-6 col-12 checkout__input">
+                                    <input asp-for="Detail.Emailid" type="email" name="email" placeholder="Email*" required />
+                                    <span asp-validation-for="Detail.Emailid" class="text-danger"></span>
+                                </div>
+                                <div class="col-xl-12 checkout__input">
+                                    <input asp-for="Detail.ContactNumber" name="Phone" placeholder="Phone*" required />
+                                    <span asp-validation-for="Detail.ContactNumber" class="text-danger"></span>
+                                </div>
+                                <div class="col-xl-12 checkout__input">
+                                    <input asp-for="Detail.Address" placeholder="Street Address*" required />
+                                    <span asp-validation-for="Detail.Address" class="text-danger"></span>
+                                </div>
+                                <div class="col-xl-12 checkout__input">
+                                    <input asp-for="Detail.Apartment" placeholder="Apartment, suite, unit (optional)" />
+                                    <span asp-validation-for="Detail.Apartment" class="text-danger"></span>
+                                </div>
+                                <div class="col-xl-6 checkout__input">
+                                    <input asp-for="Detail.City" placeholder="City*" required />
+                                    <span asp-validation-for="Detail.City" class="text-danger"></span>
+                                </div>
+                                <div class="col-xl-6 checkout__input">
+                                    <select asp-for="Detail.State" class="form-control" asp-items="Model.StateNames" required>
+                                      
+                                    
+                                            <option value="">-- Select Location --</option>
+                                      
+                                    </select>
+                                    <span asp-validation-for="Detail.State" class="text-danger"></span>
+                                </div>
+                                <div class="col-xl-12 checkout__input">
+                                    <input asp-for="Detail.PinCode" placeholder="ZIP*" required />
+                                    <span asp-validation-for="Detail.PinCode" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checkout__wrapper pb-30 wow tpfadeUp" data-wow-duration=".9s" data-wow-delay=".7s">
+                        <div class="form-check my-3">
+                            <input type="checkbox" class="form-check-input checkbox_custom" id="sameAsBilling" name="shipment" value="true" onclick="toggleShipping(this)" />
+
+                            <label class="form-check-label" for="sameAsBilling">Ship to a different address?</label>
+                        </div><div id="shippingFields" style="display:none">
+                            <span>Shipping Details:</span>
+                            <div class="checkout__content">
+                                <div class="row">
+                                    <div class="col-xl-12 checkout__input">
+                                        <input asp-for="ShippingDetail.Name" id="ShippingDetail_Name" data-field="Name" placeholder="Full Name*" />
+                                        <span asp-validation-for="ShippingDetail.Name" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-xl-12 checkout__input">
+                                        <input asp-for="ShippingDetail.Emailid" id="ShippingDetail_Emailid" data-field="Emailid" placeholder="Email*" />
+                                        <span asp-validation-for="ShippingDetail.Emailid" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-xl-12 checkout__input">
+                                        <input asp-for="ShippingDetail.ContactNumber" id="ShippingDetail_ContactNumber" data-field="ContactNumber" placeholder="Phone*" />
+                                        <span asp-validation-for="ShippingDetail.ContactNumber" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-xl-12 checkout__input">
+                                        <input asp-for="ShippingDetail.Address" id="ShippingDetail_Address" data-field="Address" placeholder="Street Address*" />
+                                        <span asp-validation-for="ShippingDetail.Address" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-xl-12 checkout__input">
+                                        <input asp-for="ShippingDetail.Apartment" id="ShippingDetail_Apartment" data-field="Apartment" placeholder="Apartment, suite, unit (optional)" />
+                                        <span asp-validation-for="ShippingDetail.Apartment" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-xl-6 checkout__input">
+                                        <input asp-for="ShippingDetail.City" id="ShippingDetail_City" data-field="City" placeholder="City*" />
+                                        <span asp-validation-for="ShippingDetail.City" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-xl-6 checkout__input">
+                                        <select asp-for="ShippingDetail.State" class="form-control" asp-items="Model.StateNames" required>
+
+
+                                            <option value="">-- Select Location --</option>
+                                        </select>
+                                        <span asp-validation-for="ShippingDetail.State" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-xl-12 checkout__input">
+                                        <input asp-for="ShippingDetail.PinCode" id="ShippingDetail_PinCode" data-field="PinCode" placeholder="ZIP*" />
+                                        <span asp-validation-for="ShippingDetail.PinCode" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="checkout__input mt-3">
+                            <label>Order notes (optional)</label>
+                            <textarea class="form-control" name="comment" placeholder="Notes about your order"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="col-xl-4 col-lg-4 wow tpfadeUp" data-wow-duration=".9s" data-wow-delay=".5s">
+                    <div class="checkout__summary-wrapper p-3 rounded shadow-sm bg-light">
+                        <div class="checkout__item">
+                            <h5 class="mb-3 fw-bold">🧾 Order Summary</h5>
+
+                            @if (Model.Carts.Count > 0)
+                            {
+                                foreach (var item in Model.Carts)
+                                {
+                                    double sub = item.Price * item.Qty;
+                                    <div class="d-flex align-items-center mb-2 gap-2">
+                                        <img src="~/@item.Image" alt="product" width="45" height="45" style="object-fit: cover; border-radius: 5px;" />
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between">
+                                                <small class="text-dark">@item.ProductName × @item.Qty</small>
+                                                <small class="fw-semibold">&#8377; @sub</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+
+                            <hr />
+
+                            @if (Model.childskuCodes.Count > 0)
+                            {
+                                foreach (var item in Model.childskuCodes)
+                                {
+                                    double sub = item.Price * item.Qty;
+                                    <div class="d-flex align-items-center mb-2 gap-2">
+                                        <img src="~/@item.Image" alt="product" width="45" height="45" style="object-fit: cover; border-radius: 5px;" />
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between">
+                                                <small class="text-dark">@item.ProductName × @item.Qty</small>
+                                                <small class="fw-semibold">&#8377; @sub</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+
+                            <hr />
+
+                            <div class="checkout__summary-list d-flex justify-content-between mb-2">
+                                <span class="text-muted">Subtotal</span>
+                                <span>&#8377; @Model.Total</span>
+                            </div>
+
+                            <div class="checkout__summary-list d-flex justify-content-between mb-2">
+                                <span class="text-muted">Shipping</span>
+                                <span>&#8377; @Model.shipping</span>
+                            </div>
+
+                            @{
+                                var finalAmount = Model.AfterDiscount > 0 ? Model.AfterDiscount + Model.shipping : Model.Total + Model.shipping;
+                            }
+
+                            <div class="checkout__bottom d-flex justify-content-between mb-3 fw-bold fs-6">
+                                <span>Total</span>
+                                <span>&#8377; @finalAmount</span>
+                                <input type="hidden" name="amount" value="@finalAmount" />
+                            </div>
+
+                            <div class="form-check mb-2">
+                                <input type="radio" name="payment" value="cod" class="form-check-input checkbox_custom" id="codOption" required />
+                                <label class="form-check-label" for="codOption">Just Enquire (No Payment)</label>
+                            </div>
+
+                            <div class="form-check mb-2">
+                                <input type="radio" name="payment" value="online" class="form-check-input checkbox_custom" id="onlineOption" />
+                                <label class="form-check-label" for="onlineOption">Complete Online Purchase</label>
+                            </div>
+
+                            <div class="form-check mb-4">
+                                <input type="checkbox" class="form-check-input checkbox_custom" name="privacyCheck" id="privacyCheck" checked />
+                                <label class="form-check-label small text-muted" for="privacyCheck">
+                                    Your personal data will be used to process your order.
+                                </label>
+                            </div>
+
+                            <button class="btn btn-warning w-100 fw-semibold py-2" type="submit" onclick="return validatePaymentMethod();">
+                                Place Order
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    function toggleShipping(checkbox) {
+        const shippingFields = document.getElementById("shippingFields");
+        shippingFields.style.display = checkbox.checked ? "block" : "none";
+
+        const map = {
+            Name: "FullName",
+            Emailid: "Emailid",
+            ContactNumber: "ContactNumber",
+            Address: "Address",
+            Apartment: "Apartment",
+            City: "City",
+            State: "State",
+            PinCode: "PinCode"
+        };
+
+        for (const key in map) {
+            const billingField = document.getElementById("Detail_" + map[key]);
+            const shippingField = document.getElementById("ShippingDetail_" + key);
+
+            if (!checkbox.checked) {
+                // Copy value from billing to shipping
+                if (billingField && shippingField) {
+                    shippingField.value = billingField.value;
+                    shippingField.removeAttribute("required");
+                }
+            } else {
+                // Clear shipping and make required
+                if (shippingField) {
+                    shippingField.value = "";
+                    shippingField.setAttribute("required", "required");
+                }
+            }
+        }
+    }
+
+    // Optional: On page load, if checkbox is not checked, prefill once
+    window.addEventListener('DOMContentLoaded', () => {
+        const checkbox = document.getElementById("sameAsBilling");
+        if (!checkbox.checked) {
+            toggleShipping(checkbox);
+        }
+    });
+</script>
+
+<script>
+         function toggleShipping(checkbox) {
+        const shippingFields = document.getElementById("shippingFields");
+        const isChecked = checkbox.checked;
+        shippingFields.style.display = isChecked ? "block" : "none";
+
+        const map = {
+            Name: "FullName",
+            Emailid: "Emailid",
+            ContactNumber: "ContactNumber",
+            Address: "Address",
+            Apartment: "Apartment",
+            City: "City",
+            State: "State",
+            PinCode: "PinCode"
+        };
+
+        for (const key in map) {
+            const billingField = document.getElementById("Detail_" + map[key]);
+            const shippingField = document.getElementById("ShippingDetail_" + key);
+
+            if (shippingField) {
+                if (isChecked) {
+                    // Enable and require fields
+                    shippingField.removeAttribute("disabled");
+                    shippingField.setAttribute("required", "required");
+                    shippingField.value = "";
+                } else {
+                    // Prefill and disable fields
+                    shippingField.value = billingField?.value || "";
+                    shippingField.setAttribute("disabled", "disabled");
+                    shippingField.removeAttribute("required");
+                }
+            }
+        }
+    }
+
+
+
+    function validatePaymentMethod() {
+        const codOption = document.getElementById("codOption").checked;
+        const onlineOption = document.getElementById("onlineOption").checked;
+
+        if (codOption) {
+            document.getElementById("paymentMethod").value = "cod";
+        } else if (onlineOption) {
+            document.getElementById("paymentMethod").value = "online";
+        } else {
+            alert("Please select a payment method.");
+            return false;
+        }
+
+        return true;
+    }
+</script>

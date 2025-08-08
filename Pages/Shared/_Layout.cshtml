@@ -1,0 +1,386 @@
+﻿@using Microsoft.AspNetCore.Http
+  @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    string mobile = HttpContextAccessor.HttpContext.Session.GetString("Mobile");
+
+    var aspPage = string.IsNullOrEmpty(mobile) ? "Register" : "UserProfile";
+  
+    var aspPageCart = string.IsNullOrEmpty(mobile) ? "Register" : "Cart";
+
+}
+
+<!DOCTYPE html>
+<html class=no-js lang=zxx>
+<head>
+    <meta charset=utf-8>
+    <meta http-equiv=x-ua-compatible content="ie=edge">
+    <title>Solvra - Ecology & Solar Energy HTML Template</title>
+    <meta name=description content="">
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" href="~/assets/img/logo/favicon.png">
+    <link rel=stylesheet href="~/assets/css/bootstrap.min.css">
+    <link rel=stylesheet href="~/assets/css/animate.css">
+    <link rel=stylesheet href="~/assets/css/custom-animation.css">
+    <link rel=stylesheet href="~/assets/css/slick.css">
+    <link rel=stylesheet href="~/assets/css/nice-select.css">
+    <link rel=stylesheet href="~/assets/css/swiper-bundle.css">
+    <link rel=stylesheet href="~/assets/css/flaticon_solvra.css">
+    <link rel=stylesheet href="~/assets/css/font-awesome-pro.css">
+    <link rel=stylesheet href="~/assets/css/magnific-popup.css">
+    <link rel=stylesheet href="~/assets/css/spacing.css">
+    <link rel=stylesheet href="~/assets/css/style.css">
+</head>
+<body id=body class=it-magic-cursor>
+    <div id=preloader>
+        <div class=preloader>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+    <div id=magic-cursor>
+        <div id=ball></div>
+    </div>
+    <button class="scroll-top scroll-to-target" data-target=html>
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+    <div class=search__popup>
+        <div class=container>
+            <div class=row>
+                <div class=col-xxl-12>
+                    <div class=search__wrapper>
+                        <div class="search__top d-flex justify-content-between align-items-center">
+                            <div class=search__logo>
+                                <a asp-page="Index">
+                                    <img src="assets/img/logo/white-logo.png" alt="">
+                                </a>
+                            </div>
+                            <div class=search__close>
+                                <button type=button class="search__close-btn search-close-btn">
+                                    <svg width=18 height=18 viewBox="0 0 18 18" fill=none xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M17 1L1 17" stroke=currentColor stroke-width=1.5 stroke-linecap=round stroke-linejoin=round />
+                                        <path d="M1 1L17 17" stroke=currentColor stroke-width=1.5 stroke-linecap=round stroke-linejoin=round />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class=search__form>
+                            <form action="#">
+                                <div class=search__input>
+                                    <input class=search-input-field type=text placeholder="Type here to search...">
+                                    <span class=search-focus-border></span>
+                                    <button type=submit>
+                                        <svg width=20 height=20 viewBox="0 0 20 20" fill=none xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M9.55 18.1C14.272 18.1 18.1 14.272 18.1 9.55C18.1 4.82797 14.272 1 9.55 1C4.82797 1 1 4.82797 1 9.55C1 14.272 4.82797 18.1 9.55 18.1Z" stroke=currentColor stroke-width=1.5 stroke-linecap=round stroke-linejoin=round />
+                                            <path d="M19.0002 19.0002L17.2002 17.2002" stroke=currentColor stroke-width=1.5 stroke-linecap=round stroke-linejoin=round />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class=it-offcanvas-area>
+        <div class=itoffcanvas>
+            <div class=itoffcanvas__close-btn>
+                <button class=close-btn><i class="fal fa-times"></i></button>
+            </div>
+            <div class=itoffcanvas__logo>
+                <a asp-page="Index">
+                    <img src="assets/img/logo/main-logo.png" alt="">
+                </a>
+            </div>
+            <div class=itoffcanvas__text>
+                <p>
+                    Suspendisse interdum consectetur libero id. Fermentum leo vel orci porta non. Euismod viverra nibh
+                    cras pulvinar suspen.
+                </p>
+            </div>
+            <div class=it-menu-mobile></div>
+            <div class=itoffcanvas__info>
+                <h3 class=offcanva-title>Get In Touch</h3>
+                <div class="it-info-wrapper mb-20 d-flex align-items-center">
+                    <div class=itoffcanvas__info-icon>
+                        <a href="#"><i class="fal fa-envelope"></i></a>
+                    </div>
+                    <div class=itoffcanvas__info-address>
+                        <span>Email</span>
+                        <a href="maito:hello@yourmail.com">hello@yourmail.com</a>
+                    </div>
+                </div>
+                <div class="it-info-wrapper mb-20 d-flex align-items-center">
+                    <div class=itoffcanvas__info-icon>
+                        <a href="#"><i class="fal fa-phone-alt"></i></a>
+                    </div>
+                    <div class=itoffcanvas__info-address>
+                        <span>Phone</span>
+                        <a href="tel:(00)45611227890">(00) 456 1122 7890</a>
+                    </div>
+                </div>
+                <div class="it-info-wrapper mb-20 d-flex align-items-center">
+                    <div class=itoffcanvas__info-icon>
+                        <a href="#"><i class="fas fa-map-marker-alt"></i></a>
+                    </div>
+                    <div class=itoffcanvas__info-address>
+                        <span>Location</span>
+                        <a href="htits://www.google.com/maps/@@37.4801311,22.8928877,3z" target=_blank>
+                            Riverside 255,
+                            San Francisco, USA
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class=body-overlay></div>
+    <header class=header-height>
+        <div id=header-sticky class="it-header-area z-index-5">
+            <div class=it-main-logo>
+                <a href=index.html><img src="assets/img/logo/main-logo.png" alt=""></a>
+            </div>
+            <div class=it-header-pl>
+                <div class="it-header-top black-bg it-header-space-lr" data-background="assets/img/header/header-top-bg.png">
+                    <div class=container-fluid>
+                        <div class="row align-items-center">
+                            <div class="col-xl-8 col-lg-6 col-md-6">
+                                <div class=it-header-top-info>
+                                    <ul>
+                                        <li class="d-none d-xl-inline-block">
+                                            <a href="tel:(00)8757845682">
+                                                <i class=flaticon-phone-call></i>
+                                                (00) 875 784 5682
+                                            </a>
+                                        </li>
+                                        <li class="d-none d-md-inline-block">
+                                            <a href="mailto:Insurinfo@gmail.com">
+                                                <i class=flaticon-mail></i>
+                                                Insurinfo@gmail.com
+                                            </a>
+                                        </li>
+                                        <li class="d-none d-xl-inline-block">
+                                            <a href="https://www.google.com/maps/@@23.7912408,90.5848486,11.67z?entry=ttu" target=_blank>
+                                                <i class=flaticon-location></i>
+                                                238, Arimantab, Moska - USA.
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-xl-4 col-lg-6 col-md-6">
+                                <div class="it-header-top-right d-flex justify-content-end">
+                                    <div class="it-header-lang-wrapper d-none d-md-block">
+                                        <div class="it-header-lang d-flex align-items-center">
+                                            <img src="assets/img/logo/logo-lang.png" alt="">
+                                            <span class="it-header-lang-selected-lang it-lang-toggle" id=it-header-lang-toggle>English <i class="fa-solid fa-angle-down"></i></span>
+                                            <ul class="it-header-lang-list it-lang-list">
+                                                <li>Spanish</li>
+                                                <li>English</li>
+                                                <li>Canada</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class=it-header-top-social>
+                                        <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+                                        <a href="#"><i class="fa-brands fa-skype"></i></a>
+                                        <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                                        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="it-header-bottom it-header-space-lr it-header-mob-space">
+                    <div class=container-fluid>
+                        <div class="row align-items-center">
+                            <div class="col-xl-8 d-none d-xl-block">
+                                <div class=it-main-menu>
+                                    <nav class=it-menu-content>
+                                        <ul>
+                                            <li>
+
+                                                <a asp-page="Index">Home</a>
+                                            </li>
+                                        
+                                            <li>
+
+                                                <a asp-page="shop">Shop</a>
+                                            </li>
+                                            <li>
+
+                                                <a asp-page="FaultReporting">Fault Reporting</a>
+                                            </li>
+
+
+                                            <li><a asp-page="EnquireNow">Contact us</a></li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                            <div class=col-xl-4>
+                                <div class="it-header-right-box d-flex align-items-center justify-content-end">
+                                    <div class="it-header-right-search d-none d-sm-block">
+                                      @*   <button class=search-open-btn>
+                                            <img src="assets/images/grocery-store.png" alt="Cart" width="24" height="24">
+                                        </button> *@
+                                    </div>
+                                    <div class="it-header-right-user d-none d-md-block ml-25">
+                                        <a asp-page="@aspPage">
+                                            <i class=flaticon-user></i>
+                                        </a>
+                                        <a asp-page="@aspPageCart">
+                                            <img src="assets/images/grocery-store.png" alt="Cart" width="30" height="35" style="margin: 0px 0px 20px 4px;">
+                                        </a>
+
+                                    </div>
+                                    <div class="it-header-right-btn d-none d-md-block ml-35">
+                                        <a asp-page="Register" class=it-btn-green>Register Now</a>
+                                    </div>
+                                    <div class="it-header-bar-wrap d-xl-none">
+                                        <button class="it-header-bar it-menu-bar">
+                                            <i class="fa-sharp fa-regular fa-bars-staggered"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer>
+        <div class="it-footer-area p-relative pt-130 pb-35 black-bg fix">
+            <div class=it-footer-shape-1>
+                <img src="assets/img/footer/shape-1.png" alt="">
+            </div>
+            <div class=it-footer-shape-2>
+                <img src="assets/img/footer/shape-2.png" alt="">
+            </div>
+            <div class=container>
+                <div class=row>
+                    <div class="col-xl-3 col-lg-4 col-md-6 mb-60">
+                        <div class="it-footer-widget footer-col-1">
+                            <div class="it-footer-logo mb-25">
+                                <a href=index.html>
+                                    <img src="assets/img/logo/footer-logo.png" alt="">
+                                </a>
+                            </div>
+                            <div class=it-footer-content>
+                                <p>
+                                    Some links on this website PureProposals.
+                                    com contain affiliate links. These links provide
+                                    a commission to PureProposals for products
+                                    or software purchased. Note that
+                                </p>
+                                <div class=it-footer-social>
+                                    <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                                    <a href="#"><i class=flaticon-twitter-1></i></a>
+                                    <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                                    <a href="#"><i class="fa-brands fa-youtube"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-4 col-md-6 mb-60">
+                        <div class="it-footer-widget footer-col-2">
+                            <h3 class="it-footer-widget-title mb-35">Useful Links</h3>
+                            <div class=it-footer-list>
+                                <ul>
+                                    <li><a href="#">About Us</a></li>
+                                    <li><a href="#">Project Gallery</a></li>
+                                    <li><a href="#">Our Services</a></li>
+                                    <li><a href="#">Our Blog</a></li>
+                                    <li><a href="#">Our Team</a></li>
+                                    <li><a href="#">Contact</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-4 col-md-6 mb-60">
+                        <div class="it-footer-widget footer-col-3">
+                            <h3 class="it-footer-widget-title mb-35">What We Do</h3>
+                            <div class=it-footer-list>
+                                <ul>
+                                    <li><a href="#">Our Service</a></li>
+                                    <li><a href="#">Solar Panel</a></li>
+                                    <li><a href="#">Turbines Services</a></li>
+                                    <li><a href="#">Hydropower Plants</a></li>
+                                    <li><a href="#">Fossil Resources</a></li>
+                                    <li><a href="#">Charge Controllers</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-4 col-md-6 mb-60">
+                        <div class="it-footer-widget p-relative footer-col-4">
+                            <h3 class="it-footer-widget-title mb-35">Contact</h3>
+                            <div class=it-footer-contact>
+                                <div class="it-footer-info d-flex align-items-center">
+                                    <i class=flaticon-map></i>
+                                    <a href="#">
+                                        569 Cost AvenueSilver Spring,
+                                        MD 20910.New york
+                                    </a>
+                                </div>
+                                <div class="it-footer-info d-flex align-items-center">
+                                    <i class=flaticon-phone-call></i>
+                                    <a href=tel:890301-415-5058>(+890)301-415-5058</a>
+                                </div>
+                                <div class="it-footer-info d-flex align-items-center">
+                                    <i class=flaticon-email></i>
+                                    <a href="mailto:ekomfy@gmail.com">ekomfy@gmail.com</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="it-copyright-area pt-15 pb-15 theme-bg">
+            <div class=container>
+                <div class="row align-items-center">
+                    <div class="col-xl-6 col-lg-6">
+                        <div class="it-copyright-content text-center text-lg-start">
+                            <p>
+                                Copyright © 2025 <span><a href=index.html>Tallysia</a></span>. All Rights Reserved Made by
+                                <span><a href="#">❤️</a></span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6">
+                        <div class="it-copyright-privacy text-center text-lg-end">
+                            <a href="#">Terms & Conditions - Privacy Policy - Sitemap</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="~/assets/js/jquery.js"></script>
+    <script src="~/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="~/assets/js/gsap.js"></script>
+    <script src="~/assets/js/slick.min.js"></script>
+    <script src="~/assets/js/jarallax.js"></script>
+    <script src="~/assets/js/magnific-popup.js"></script>
+    <script src="~/assets/js/purecounter.js"></script>
+    <script src="~/assets/js/wow.js"></script>
+    <script src="~/assets/js/nice-select.js"></script>
+    <script src="~/assets/js/swiper-bundle.js"></script>
+    <script src="~/assets/js/isotope-pkgd.js"></script>
+    <script src="~/assets/js/imagesloaded-pkgd.js"></script>
+    <script src="~/assets/js/ajax-form.js"></script>
+    <script src="~/assets/js/main.js"></script>
+    <script src="~/assets/js/it-cursor.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

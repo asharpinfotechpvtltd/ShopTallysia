@@ -1,0 +1,110 @@
+﻿@page
+@model EcommerceTelysia.Areas.Dashboard.Pages.Inventory_Details.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+    var warehouseList = (List<SelectListItem>)ViewData["WarehouseId"];
+    var productList = (List<SelectListItem>)ViewData["ProductId"];
+}
+
+<h1>Edit</h1>
+
+<h4>Inventory</h4>
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Inventory.InventoryId" />
+
+            <!-- ProductId -->
+            <div class="form-group">
+                <label asp-for="Inventory.ProductId" class="control-label"></label>
+                <select asp-for="Inventory.ProductId" class="form-control" asp-items="productList"></select>
+                <span asp-validation-for="Inventory.ProductId" class="text-danger"></span>
+            </div>
+
+            <!-- SKU -->
+            <div class="form-group">
+                <label asp-for="Inventory.SKU" class="control-label"></label>
+                <input asp-for="Inventory.SKU" class="form-control" />
+                <span asp-validation-for="Inventory.SKU" class="text-danger"></span>
+            </div>
+
+            <!-- Product Name -->
+            <div class="form-group">
+                <label asp-for="Inventory.ProductName" class="control-label"></label>
+                <input asp-for="Inventory.ProductName" class="form-control" />
+                <span asp-validation-for="Inventory.ProductName" class="text-danger"></span>
+            </div>
+
+            <!-- Total Quantity -->
+            <div class="form-group">
+                <label asp-for="Inventory.TotalQuantity" class="control-label"></label>
+                <input asp-for="Inventory.TotalQuantity" class="form-control" />
+                <span asp-validation-for="Inventory.TotalQuantity" class="text-danger"></span>
+            </div>
+
+            <!-- Multi Warehouse -->
+            <div class="form-group">
+                <label class="control-label">Warehouses</label>
+                <div id="warehouseContainer">
+                    @for (int i = 0; i < Model.SelectedWarehouseIds.Count; i++)
+                    {
+                        <div class="input-group mb-2 warehouse-row">
+                            <select name="SelectedWarehouseIds" class="form-control">
+                                @foreach (var wh in warehouseList)
+                                {
+                                    var selected = Model.SelectedWarehouseIds[i] == wh.Value ? "selected" : "";
+                                    <option value="@wh.Value" selected="@selected">@wh.Text</option>
+                                }
+
+                            </select>
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-success btn-add">+</button>
+                                <button type="button" class="btn btn-danger btn-remove">−</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <span asp-validation-for="SelectedWarehouseIds" class="text-danger"></span>
+            </div>
+
+            <!-- Last Updated -->
+            <div class="form-group">
+                <label asp-for="Inventory.LastUpdated" class="control-label"></label>
+                <input asp-for="Inventory.LastUpdated" class="form-control" />
+                <span asp-validation-for="Inventory.LastUpdated" class="text-danger"></span>
+            </div>
+
+            <!-- Submit -->
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+
+    <script>
+        $(document).ready(function () {
+            $('#warehouseContainer').on('click', '.btn-add', function () {
+                var clone = $(this).closest('.warehouse-row').clone();
+                clone.find('select').val('');
+                $('#warehouseContainer').append(clone);
+            });
+
+            $('#warehouseContainer').on('click', '.btn-remove', function () {
+                if ($('#warehouseContainer .warehouse-row').length > 1) {
+                    $(this).closest('.warehouse-row').remove();
+                }
+            });
+        });
+    </script>
+}

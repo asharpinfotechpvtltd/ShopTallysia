@@ -1,0 +1,224 @@
+﻿@page
+@model EcommerceTelysia.Areas.Dashboard.Pages.Orders.OrderDetailsModel
+@functions {
+    int i = 1;
+    double totalamount = 0;
+    double Shipping = 0;
+    double Discount = 0;
+    double? GST = 0;
+    double? TotalGST = 0;
+    double? SubTotal = 0;
+    double shippinggst = 0;
+    double computedgst = 0;
+    double shipgst = 0;
+    double actualshippinggst = 0;
+    double codcharge = 0;
+    double codchargesgst = 0;
+}
+
+<style>
+    .order-section {
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        margin-bottom: 30px;
+    }
+
+    .order-title {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+
+    .order-address p, .order-status form {
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .table thead {
+        background-color: #eaeaea;
+    }
+
+    .order-summary td {
+        font-weight: 500;
+        padding: 10px 15px;
+    }
+
+    .order-summary .label {
+        text-align: right;
+    }
+</style>
+
+<div class="outer-w3-agile mt-3">
+    <div class="order-section">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="order-title">
+                    Order #@Model.OrderId.Orderid - Payment detail as on @Model.OrderId.Date
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <h5>Billing Information</h5>
+                <div class="order-address">
+                    <p>
+                        @Model.BillingDetail.FullName<br />
+                        @Model.BillingDetail.Apartment, @Model.BillingDetail.Address<br />
+                        @Model.BillingDetail.City - @Model.BillingDetail.PinCode<br />
+                        @Model.BillingDetail.State, @Model.BillingDetail.Country
+                    </p>
+                    <p>Email: <a href="mailto:@Model.BillingDetail.Emailid">@Model.BillingDetail.Emailid</a></p>
+                    <p>Phone: <a href="tel:@Model.BillingDetail.ContactNumber">@Model.BillingDetail.ContactNumber</a></p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <h5>Shipping Information</h5>
+                <div class="order-address">
+                    <p>
+                        @Model.ShippingDetail.Name @Model.ShippingDetail.LastName<br />
+                        @Model.ShippingDetail.Address<br />
+                        @Model.ShippingDetail.City - @Model.ShippingDetail.PinCode<br />
+                        @Model.ShippingDetail.State, @Model.ShippingDetail.Country
+                    </p>
+                    <p>Email: <a href="mailto:@Model.ShippingDetail.Emailid">@Model.ShippingDetail.Emailid</a></p>
+                    <p>Phone: <a href="tel:@Model.ShippingDetail.ContactNumber">@Model.ShippingDetail.ContactNumber</a></p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <h5>Update Order Status</h5>
+                <form asp-page-handler="Update" method="post">
+                    <input type="hidden" name="orderid" value="@Model.OrderId.Orderid" />
+                    <select class="form-control mb-2" name="Status">
+                        <option>Select</option>
+                        <option>Pending</option>
+                        <option>Completed</option>
+                        <option>Dispatched</option>
+                    </select>
+                    <input type="submit" class="btn btn-primary" value="Update" />
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="order-section">
+        <h5>Ordered Items</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Product Name</th>
+                        <th>Product ID</th>
+                      
+                        <th>GST %</th>
+                      
+                        <th>Price</th>
+                        <th>Qty</th>
+                        <th>Total</th>
+                        <th>Update</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var detail in Model.CustomerdetailsDTOs)
+                    {
+                        double total = Convert.ToDouble(detail.Qty * detail.Price);
+                        totalamount += total;
+                        TotalGST += detail.Gst;
+                        <tr>
+                            <td>@i</td>
+                            <td>@detail.ProductName</td>
+                            <td>@detail.ProductId</td>
+                         
+                            <td>@detail.Gst</td>
+                           
+                            <td>@detail.Price</td>
+                            <td>@detail.Qty</td>
+                            <td>@total</td>
+                            <td>
+                                <form asp-page-handler="UpdateStatus" method="post">
+                                    <input type="hidden" name="SkuCode" value="@detail.ProductId" />
+                                    <input type="hidden" name="orderId" value="@Model.OrderId.Orderid" />
+                                    <select name="Status" class="form-control mb-2">
+                                        <option>Select</option>
+                                        <option>Pending</option>
+                                        <option>Completed</option>
+                                        <option>Dispatched</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                                </form>
+                            </td>
+                        </tr>
+                        i++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="order-section">
+        <h5>Order Summary</h5>
+        <table class="table table-borderless order-summary">
+            <tr>
+                <td class="label">Items Subtotal:</td>
+                <td>@{
+                        SubTotal = totalamount - TotalGST;
+                    } ₹@Model.SubTotal</td>
+            </tr>
+            <tr>
+                <td class="label">GST:</td>
+                <td>@{
+                        GST = TotalGST;
+                    } ₹3%</td>
+            </tr>
+            <tr>
+                <td class="label">Shipping:</td>
+                <td>
+                    @{
+                        Shipping = totalamount >= 3000 ? 0 : Model.OrderId.PaymentFrom.ToLower() == "cod" ? 200 : 80;
+                    }
+                    ₹@Shipping
+                </td>
+            </tr>
+            <tr>
+                <td class="label">After Discount:</td>
+                <td>
+                    @{
+                        Discount = Convert.ToDouble(Model.OrderId.CouponCodeapplied);
+                    }
+                    ₹@Model.AfterDiscount
+                </td>
+            </tr>
+            @if (Model.OrderId.PaymentFrom == "COD")
+            {
+                codcharge = 42.37;
+                codchargesgst = 7.63;
+                <tr><td class="label">COD Charge:</td><td>₹@codcharge</td></tr>
+                <tr><td class="label">COD GST:</td><td>₹@codchargesgst</td></tr>
+            }
+            <tr><td colspan="2"><hr /></td></tr>
+            <tr>
+                <td class="label">Total Amount:</td>
+                <td>
+                    @{
+                        double grandtotal = (totalamount + Shipping + codcharge + codchargesgst) - Discount;
+                    }
+                    ₹@Model.Total
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="order-section">
+        <h5>Order Notes</h5>
+        <p>@(!string.IsNullOrEmpty(Model.OrderId.OrderNotes) ? Model.OrderId.OrderNotes : "No notes available for this order.")</p>
+    </div>
+
+    <div class="mt-4">
+        <a class="btn btn-outline-primary" asp-page="./PrintInvoice" asp-route-Orderid="@Model.OrderId.Orderid" asp-route-Email="@Model.OrderId.Emailid"><i class="fa fa-print"></i> Print Invoice</a>
+        <a class="btn btn-outline-success ml-2" asp-page="./ShipRocket" asp-route-Orderid="@Model.OrderId.Orderid" asp-route-Email="@Model.OrderId.Emailid"><i class="fa fa-forward"></i> ShipRocket</a>
+        <a class="btn btn-outline-secondary ml-2" asp-page="./BillingDetails">Back to List</a>
+    </div>
+</div>

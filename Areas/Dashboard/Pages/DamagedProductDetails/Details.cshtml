@@ -1,0 +1,61 @@
+﻿@page
+@model EcommerceTelysia.Areas.Dashboard.Pages.DamagedProductDetails.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>DamagedProducts</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DamagedProducts.SKU)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DamagedProducts.SKU)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DamagedProducts.ProductName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DamagedProducts.ProductName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DamagedProducts.DamagedQuantity)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DamagedProducts.DamagedQuantity)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DamagedProducts.DamageReason)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DamagedProducts.DamageReason)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DamagedProducts.TblWarehouseMaster)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DamagedProducts.TblWarehouseMaster.WarehouseId)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DamagedProducts.Products)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DamagedProducts.Products.Id)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DamagedProducts.ReportedOn)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DamagedProducts.ReportedOn)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.DamagedProducts.DamageReportId">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>

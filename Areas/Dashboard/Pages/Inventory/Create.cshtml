@@ -1,0 +1,94 @@
+﻿@page
+@model EcommerceTelysia.Areas.Dashboard.Pages.Inventory_Details.CreateModel
+
+@{
+    ViewData["Title"] = "Create Inventory";
+}
+
+<h1>Create Inventory</h1>
+<hr />
+
+<form method="post">
+    <div class="form-group">
+        <label asp-for="SelectedProductId">Select Product</label>
+        <select asp-for="SelectedProductId" class="form-control" asp-items="Model.AvailableProducts" required>
+            <option value="">-- Select Product --</option>
+        </select>
+    </div>
+
+    <hr />
+    <h4>Warehouse Quantities</h4>
+
+    <table class="table" id="warehouseTable">
+        <thead>
+            <tr>
+                <th>Warehouse</th>
+                <th>Quantity</th>
+                <th>
+                    <button type="button" class="btn btn-sm btn-success" onclick="addRow()">+</button>
+                </th>
+            </tr>
+        </thead>
+        <tbody id="warehouseBody">
+            <tr>
+                <td>
+                    <select name="warehouseIds" class="form-control" required>
+                        @foreach (var warehouse in Model.WarehouseList)
+                        {
+                            <option value="@warehouse.Value">@warehouse.Text</option>
+                        }
+                    </select>
+                </td>
+                <td>
+                    <input name="quantities" class="form-control" type="number" min="0" required />
+                </td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">-</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="form-group">
+        <input type="submit" value="Save Inventory" class="btn btn-primary" />
+        <a asp-page="Index" class="btn btn-secondary ml-2">Cancel</a>
+    </div>
+</form>
+
+
+<div id="warehouseOptions" style="display: none;">
+    @foreach (var warehouse in Model.WarehouseList)
+    {
+        <option value="@warehouse.Value">@warehouse.Text</option>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function addRow() {
+            const optionsHtml = document.getElementById("warehouseOptions").innerHTML;
+
+            const row = `
+                <tr>
+                    <td>
+                        <select name="warehouseIds" class="form-control" required>
+                            ${optionsHtml}
+                        </select>
+                    </td>
+                    <td>
+                        <input name="quantities" class="form-control" type="number" min="0" required />
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">-</button>
+                    </td>
+                </tr>`;
+
+            document.getElementById("warehouseBody").insertAdjacentHTML("beforeend", row);
+        }
+
+        function removeRow(button) {
+            const row = button.closest("tr");
+            row.remove();
+        }
+    </script>
+}

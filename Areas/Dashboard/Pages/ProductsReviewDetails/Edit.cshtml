@@ -1,0 +1,66 @@
+﻿@page
+@model EcommerceTelysia.Areas.Dashboard.Pages.ProductsReviewDetails.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Reviews</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Reviews.Id" />
+            <div class="form-group">
+                
+                <label asp-for="Reviews.comment" class="control-label"></label>
+                <input asp-for="Reviews.comment" class="form-control" />
+                <span asp-validation-for="Reviews.comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Reviews.email" class="control-label"></label>
+                <input asp-for="Reviews.email" class="form-control" />
+                <span asp-validation-for="Reviews.email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Reviews.Date" class="control-label"></label>
+                <input asp-for="Reviews.Date" class="form-control" />
+                <span asp-validation-for="Reviews.Date" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Reviews.review" class="control-label"></label>
+                <input asp-for="Reviews.review" class="form-control" />
+                <span asp-validation-for="Reviews.review" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                
+                <label asp-for="Reviews.ProductId" class="control-label"></label>
+                <input asp-for="Reviews.ProductId" class="form-control" />
+                <span asp-validation-for="Reviews.ProductId" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Reviews.Isviewable" /> @Html.DisplayNameFor(model => model.Reviews.Isviewable)
+                </label>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
