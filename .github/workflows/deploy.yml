@@ -77,7 +77,7 @@ jobs:
           if ($code -gt 3) { throw "Backup robocopy failed with exit code $code" }
 
       - name: Deploy to inetpub
-        shell: powershell
+        shell: powershell 
         run: |
           $src = "C:\deploy\publish"
           $dst = "C:\inetpub\wwwroot\tallysiaenergy"
