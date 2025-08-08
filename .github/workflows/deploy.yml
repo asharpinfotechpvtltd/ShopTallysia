@@ -47,7 +47,7 @@ jobs:
         shell: powershell
         run: |
           $sitePath = "C:\inetpub\wwwroot\tallysiaenergy"
-          $pool     = "tallysiaenergy"   # exact IIS App Pool name
+          $pool     = "tallysiaenergy"   # IIS App Pool name
 
           if (!(Test-Path $sitePath)) { New-Item -ItemType Directory -Path $sitePath -Force | Out-Null }
           New-Item "$sitePath\app_offline.htm" -ItemType File -Force | Out-Null
@@ -75,9 +75,10 @@ jobs:
           $code = $LASTEXITCODE
           Write-Host "Robocopy (backup) exit code: $code"
           if ($code -gt 3) { throw "Backup robocopy failed with exit code $code" }
+          $global:LASTEXITCODE = 0   # <- reset so step returns success
 
       - name: Deploy to inetpub
-        shell: powershell 
+        shell: powershell
         run: |
           $src = "C:\deploy\publish"
           $dst = "C:\inetpub\wwwroot\tallysiaenergy"
@@ -86,6 +87,7 @@ jobs:
           $code = $LASTEXITCODE
           Write-Host "Robocopy (deploy) exit code: $code"
           if ($code -gt 3) { throw "Deploy robocopy failed with exit code $code" }
+          $global:LASTEXITCODE = 0   # <- reset so step returns success
 
       - name: Start site & warm-up (safe)
         shell: powershell
