@@ -1,0 +1,72 @@
+name: CI-CD to IIS (tallysiaenergy)
+
+on:
+  push:
+    branches: [ "masterbranch", "main", "master" ]   # tumhari active branch "masterbranch" hai
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"   # agar 7/6 use ho, yahan change kar dena
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build -c Release --no-restore
+
+      - name: Publish
+        run: dotnet publish ./EcommerceTelysia.csproj -c Release -o ./publish
+
+      - name: Zip artifact
+        shell: pwsh
+        run: Compress-Archive -Path publish\* -DestinationPath package.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: webapp-package
+          path: package.zip
+
+  deploy:
+    needs: build
+    runs-on: self-hosted   # EC2 runner
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: webapp-package
+          path: C:\deploy\temp
+
+      - name: Stop site (app_offline + stop app pool)
+        shell: powershell
+        run: |
+          $site = "C:\inetpub\wwwroot\tallysiaenergy"
+          New-Item "$site\app_offline.htm" -ItemType File -Force | Out-Null
+          & $env:windir\system32\inetsrv\appcmd stop apppool /apppool.name:"tallysiaenergy" | Out-Null
+
+      - name: Backup current
+        shell: powershell
+        run: |
+          $backup = "C:\deploy\backups\$(Get-Date -f yyyyMMdd_HHmmss)"
+          robocopy "C:\inetpub\wwwroot\tallysiaenergy" $backup /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
+
+      - name: Deploy new build to inetpub
+        shell: powershell
+        run: |
+          $zip="C:\deploy\temp\package.zip"
+          $extract="C:\deploy\temp\extracted"
+          if (Test-Path $extract) { Remove-Item $extract -Recurse -Force }
+          Expand-Archive $zip -DestinationPath $extract -Force
+          robocopy $extract "C:\inetpub\wwwroot\tallysiaenergy" /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
+
+      - name: Start site & warm-up
+        shell: powershell
+        run: |
+          & $env:windir\system32\inetsrv\appcmd start apppool /apppool.name:"tallysiaenergy" | Out-Null
+          Remove-Item "C:\inetpub\wwwroot\tallysiaenergy\app_offline.htm" -Force
+          try { Invoke-WebRequest "http://localhost/" -UseBasicParsing -TimeoutSec 15 | Out-Null } catch {}
