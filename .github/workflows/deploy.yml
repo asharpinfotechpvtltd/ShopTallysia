@@ -2,47 +2,47 @@ name: CI-CD to IIS (tallysiaenergy)
 
 on:
   push:
-    branches: [ "masterbranch", "main", "master" ]   # tumhari active branch "masterbranch" hai
+    branches: [ "masterbranch" ]
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-dotnet@v4
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "9.0.x"   # agar 7/6 use ho, yahan change kar dena
+          dotnet-version: "9.0.x"
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore ./EcommerceTelysia.csproj
 
-      - name: Build
-        run: dotnet build -c Release --no-restore
+      - name: Build (warnings ≠ errors)
+        run: dotnet build ./EcommerceTelysia.csproj -c Release --no-restore /p:TreatWarningsAsErrors=false
 
-      - name: Publish
-        run: dotnet publish ./EcommerceTelysia.csproj -c Release -o ./publish
+      - name: Publish (warnings ≠ errors)
+        run: dotnet publish ./EcommerceTelysia.csproj -c Release -o ./publish /p:TreatWarningsAsErrors=false
 
-      - name: Zip artifact
-        shell: pwsh
-        run: Compress-Archive -Path publish\* -DestinationPath package.zip
-
-      - uses: actions/upload-artifact@v4
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: webapp-package
-          path: package.zip
+          name: published-app
+          path: ./publish
 
   deploy:
     needs: build
-    runs-on: self-hosted   # EC2 runner
+    runs-on: self-hosted      # <- tumhara EC2 runner
     steps:
-      - uses: actions/download-artifact@v4
+      - name: Download artifact
+        uses: actions/download-artifact@v4
         with:
-          name: webapp-package
-          path: C:\deploy\temp
+          name: published-app
+          path: C:\deploy\publish
 
-      - name: Stop site (app_offline + stop app pool)
+      - name: Stop site (app_offline + stop pool)
         shell: powershell
         run: |
           $site = "C:\inetpub\wwwroot\tallysiaenergy"
@@ -52,17 +52,14 @@ jobs:
       - name: Backup current
         shell: powershell
         run: |
-          $backup = "C:\deploy\backups\$(Get-Date -f yyyyMMdd_HHmmss)"
-          robocopy "C:\inetpub\wwwroot\tallysiaenergy" $backup /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
+          $src = "C:\inetpub\wwwroot\tallysiaenergy"
+          $dst = "C:\deploy\backups\$(Get-Date -f yyyyMMdd_HHmmss)"
+          robocopy $src $dst /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
 
-      - name: Deploy new build to inetpub
+      - name: Deploy to inetpub
         shell: powershell
         run: |
-          $zip="C:\deploy\temp\package.zip"
-          $extract="C:\deploy\temp\extracted"
-          if (Test-Path $extract) { Remove-Item $extract -Recurse -Force }
-          Expand-Archive $zip -DestinationPath $extract -Force
-          robocopy $extract "C:\inetpub\wwwroot\tallysiaenergy" /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
+          robocopy "C:\deploy\publish" "C:\inetpub\wwwroot\tallysiaenergy" /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
 
       - name: Start site & warm-up
         shell: powershell
