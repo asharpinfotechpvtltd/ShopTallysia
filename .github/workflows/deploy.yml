@@ -21,15 +21,14 @@ jobs:
       - name: Print SDK info
         run: dotnet --info
 
-      # 👉 सिर्फ WEB PROJECT restore/build/publish
       - name: Restore (web project only)
         run: dotnet restore ./EcommerceTelysia.csproj
 
       - name: Build project (warnings ≠ errors)
-        run: dotnet build ./EcommerceTelysia.csproj --configuration Release --no-restore -warnaserror-
+        run: dotnet build ./EcommerceTelysia.csproj --configuration Release --no-restore -p:TreatWarningsAsErrors=false
 
       - name: Publish project
-        run: dotnet publish ./EcommerceTelysia.csproj --configuration Release --no-build --output ./publish -warnaserror-
+        run: dotnet publish ./EcommerceTelysia.csproj --configuration Release --no-build --output ./publish -p:TreatWarningsAsErrors=false
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
