@@ -3,8 +3,8 @@ name: Build and Deploy Tallysia
 on:
   push:
     branches:
-      - masterbranch     # <- tumhari branch
-  workflow_dispatch:  
+      - masterbranch        # <- yahan apni branch ka exact naam
+  workflow_dispatch:        # Actions se manual run button
 
 jobs:
   build:
@@ -18,14 +18,14 @@ jobs:
         with:
           dotnet-version: 9.0.x
 
-      - name: Restore dependencies
-        run: dotnet restore
+      - name: Restore (web project only)
+        run: dotnet restore ./EcommerceTelysia.csproj
 
-      - name: Build project (ignore warnings)
-        run: dotnet build ./EcommerceTelysia.csproj --configuration Release --no-restore
+      - name: Build (warnings ≠ errors)
+        run: dotnet build ./EcommerceTelysia.csproj -c Release --no-restore -p:TreatWarningsAsErrors=false
 
-      - name: Publish project
-        run: dotnet publish ./EcommerceTelysia.csproj --no-build --configuration Release --output ./publish
+      - name: Publish
+        run: dotnet publish ./EcommerceTelysia.csproj -c Release --no-build -o ./publish -p:TreatWarningsAsErrors=false
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -33,63 +33,63 @@ jobs:
           name: published-app
           path: ./publish
 
- deploy:
-  needs: build
-  runs-on: self-hosted
-  steps:
-    - name: Download artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: published-app
-        path: C:\deploy\publish
+  deploy:
+    needs: build
+    runs-on: self-hosted           # EC2 runner
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: published-app
+          path: C:\deploy\publish
 
-    - name: Stop site (app_offline + stop pool safely)
-      shell: powershell
-      run: |
-        $sitePath = "C:\inetpub\wwwroot\tallysiaenergy"
-        $pool     = "tallysiaenergy"   # <- EXACT app pool name from IIS
+      - name: Stop site (app_offline + stop pool safely)
+        shell: powershell
+        run: |
+          $sitePath = "C:\inetpub\wwwroot\tallysiaenergy"
+          $pool     = "tallysiaenergy"   # IIS me jo exact naam dikha, wahi
 
-        if (!(Test-Path $sitePath)) { New-Item -ItemType Directory -Path $sitePath | Out-Null }
-        New-Item "$sitePath\app_offline.htm" -ItemType File -Force | Out-Null
+          if (!(Test-Path $sitePath)) { New-Item -ItemType Directory -Path $sitePath | Out-Null }
+          New-Item "$sitePath\app_offline.htm" -ItemType File -Force | Out-Null
 
-        Import-Module WebAdministration
-        Write-Host "Available app pools:"; (Get-ChildItem IIS:\AppPools | Select-Object name,state) | Format-Table -AutoSize
-        if (Test-Path "IIS:\AppPools\$pool") {
-          $state = (Get-WebAppPoolState -Name $pool).Value
-          Write-Host "Current state of $pool: $state"
-          if ($state -ne 'Stopped') { Stop-WebAppPool -Name $pool }
-        } else {
-          Write-Host "App pool '$pool' not found. Skipping stop."
-        }
+          Import-Module WebAdministration
+          Write-Host "Available app pools:"; (Get-ChildItem IIS:\AppPools | Select-Object name,state) | Format-Table -AutoSize
+          if (Test-Path "IIS:\AppPools\$pool") {
+            $state = (Get-WebAppPoolState -Name $pool).Value
+            Write-Host "Current state of $pool: $state"
+            if ($state -ne 'Stopped') { Stop-WebAppPool -Name $pool }
+          } else {
+            Write-Host "App pool '$pool' not found. Skipping stop."
+          }
 
-    - name: Backup current
-      shell: powershell
-      run: |
-        $src = "C:\inetpub\wwwroot\tallysiaenergy"
-        $dst = "C:\deploy\backups\$(Get-Date -f yyyyMMdd_HHmmss)"
-        if (!(Test-Path $dst)) { New-Item -ItemType Directory -Path $dst | Out-Null }
-        robocopy $src $dst /MIR /NFL /NDL /NJH /NJS /NP
-        $code = $LASTEXITCODE
-        if ($code -gt 3) { throw "Backup robocopy failed with exit code $code" }
+      - name: Backup current
+        shell: powershell
+        run: |
+          $src = "C:\inetpub\wwwroot\tallysiaenergy"
+          $dst = "C:\deploy\backups\$(Get-Date -f yyyyMMdd_HHmmss)"
+          if (!(Test-Path $dst)) { New-Item -ItemType Directory -Path $dst | Out-Null }
+          robocopy $src $dst /MIR /NFL /NDL /NJH /NJS /NP
+          $code = $LASTEXITCODE
+          if ($code -gt 3) { throw "Backup robocopy failed with exit code $code" }
 
-    - name: Deploy to inetpub
-      shell: powershell
-      run: |
-        $src = "C:\deploy\publish"
-        $dst = "C:\inetpub\wwwroot\tallysiaenergy"
-        robocopy $src $dst /MIR /NFL /NDL /NJH /NJS /NP
-        $code = $LASTEXITCODE
-        if ($code -gt 3) { throw "Deploy robocopy failed with exit code $code" }
+      - name: Deploy to inetpub
+        shell: powershell
+        run: |
+          $src = "C:\deploy\publish"
+          $dst = "C:\inetpub\wwwroot\tallysiaenergy"
+          robocopy $src $dst /MIR /NFL /NDL /NJH /NJS /NP
+          $code = $LASTEXITCODE
+          if ($code -gt 3) { throw "Deploy robocopy failed with exit code $code" }
 
-    - name: Start site & warm-up (safe)
-      shell: powershell
-      run: |
-        $pool = "tallysiaenergy"       # <- same name
-        Import-Module WebAdministration
-        if (Test-Path "IIS:\AppPools\$pool") {
-          Start-WebAppPool -Name $pool
-        } else {
-          Write-Host "App pool '$pool' not found. Skipping start."
-        }
-        Remove-Item "C:\inetpub\wwwroot\tallysiaenergy\app_offline.htm" -Force -ErrorAction SilentlyContinue
-        try { Invoke-WebRequest "http://localhost/" -UseBasicParsing -TimeoutSec 15 | Out-Null } catch {}
+      - name: Start site & warm-up (safe)
+        shell: powershell
+        run: |
+          $pool = "tallysiaenergy"
+          Import-Module WebAdministration
+          if (Test-Path "IIS:\AppPools\$pool") {
+            Start-WebAppPool -Name $pool
+          } else {
+            Write-Host "App pool '$pool' not found. Skipping start."
+          }
+          Remove-Item "C:\inetpub\wwwroot\tallysiaenergy\app_offline.htm" -Force -ErrorAction SilentlyContinue
+          try { Invoke-WebRequest "http://localhost/" -UseBasicParsing -TimeoutSec 15 | Out-Null } catch {}
