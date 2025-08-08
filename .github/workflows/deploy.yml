@@ -3,8 +3,8 @@ name: Build and Deploy Tallysia
 on:
   push:
     branches:
-      - masterbranch        # <- yahan apni branch ka exact naam
-  workflow_dispatch:        # Actions se manual run button
+      - masterbranch
+  workflow_dispatch:
 
 jobs:
   build:
@@ -35,7 +35,7 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: self-hosted           # EC2 runner
+    runs-on: self-hosted    # your EC2 runner
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
@@ -47,7 +47,7 @@ jobs:
         shell: powershell
         run: |
           $sitePath = "C:\inetpub\wwwroot\tallysiaenergy"
-          $pool     = "tallysiaenergy"   # IIS me jo exact naam dikha, wahi
+          $pool     = "tallysiaenergy"   # exact IIS app pool name
 
           if (!(Test-Path $sitePath)) { New-Item -ItemType Directory -Path $sitePath | Out-Null }
           New-Item "$sitePath\app_offline.htm" -ItemType File -Force | Out-Null
@@ -56,7 +56,7 @@ jobs:
           Write-Host "Available app pools:"; (Get-ChildItem IIS:\AppPools | Select-Object name,state) | Format-Table -AutoSize
           if (Test-Path "IIS:\AppPools\$pool") {
             $state = (Get-WebAppPoolState -Name $pool).Value
-            Write-Host "Current state of $pool: $state"
+            Write-Host "Current state of ${pool}: ${state}"
             if ($state -ne 'Stopped') { Stop-WebAppPool -Name $pool }
           } else {
             Write-Host "App pool '$pool' not found. Skipping stop."
