@@ -1,30 +1,30 @@
-name: CI-CD to IIS (tallysiaenergy)
+name: Build and Deploy Tallysia
 
 on:
   push:
-    branches: [ "masterbranch" ]
-  workflow_dispatch:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: windows-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup .NET 9
+      - name: Setup .NET 9.0
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "9.0.x"
+          dotnet-version: 9.0.x
 
-      - name: Restore
-        run: dotnet restore ./EcommerceTelysia.csproj
+      - name: Restore dependencies
+        run: dotnet restore
 
-      - name: Build (warnings ≠ errors)
-        run: dotnet build ./EcommerceTelysia.csproj -c Release --no-restore /p:TreatWarningsAsErrors=false
+      - name: Build project (ignore warnings)
+        run: dotnet build --no-restore -warnaserror- --configuration Release
 
-      - name: Publish (warnings ≠ errors)
-        run: dotnet publish ./EcommerceTelysia.csproj -c Release -o ./publish /p:TreatWarningsAsErrors=false
+      - name: Publish project
+        run: dotnet publish --no-build --configuration Release --output ./publish
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -34,7 +34,7 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: self-hosted      # <- tumhara EC2 runner
+    runs-on: self-hosted
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
@@ -46,6 +46,7 @@ jobs:
         shell: powershell
         run: |
           $site = "C:\inetpub\wwwroot\tallysiaenergy"
+          if (!(Test-Path $site)) { New-Item -ItemType Directory -Path $site | Out-Null }
           New-Item "$site\app_offline.htm" -ItemType File -Force | Out-Null
           & $env:windir\system32\inetsrv\appcmd stop apppool /apppool.name:"tallysiaenergy" | Out-Null
 
@@ -54,16 +55,23 @@ jobs:
         run: |
           $src = "C:\inetpub\wwwroot\tallysiaenergy"
           $dst = "C:\deploy\backups\$(Get-Date -f yyyyMMdd_HHmmss)"
-          robocopy $src $dst /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
+          if (!(Test-Path $dst)) { New-Item -ItemType Directory -Path $dst | Out-Null }
+          robocopy $src $dst /MIR /NFL /NDL /NJH /NJS /NP
+          $code = $LASTEXITCODE
+          if ($code -gt 3) { throw "Backup robocopy failed with exit code $code" }
 
       - name: Deploy to inetpub
         shell: powershell
         run: |
-          robocopy "C:\deploy\publish" "C:\inetpub\wwwroot\tallysiaenergy" /MIR /NFL /NDL /NJH /NJS /NP | Out-Null
+          $src = "C:\deploy\publish"
+          $dst = "C:\inetpub\wwwroot\tallysiaenergy"
+          robocopy $src $dst /MIR /NFL /NDL /NJH /NJS /NP
+          $code = $LASTEXITCODE
+          if ($code -gt 3) { throw "Deploy robocopy failed with exit code $code" }
 
       - name: Start site & warm-up
         shell: powershell
         run: |
           & $env:windir\system32\inetsrv\appcmd start apppool /apppool.name:"tallysiaenergy" | Out-Null
-          Remove-Item "C:\inetpub\wwwroot\tallysiaenergy\app_offline.htm" -Force
+          Remove-Item "C:\inetpub\wwwroot\tallysiaenergy\app_offline.htm" -Force -ErrorAction SilentlyContinue
           try { Invoke-WebRequest "http://localhost/" -UseBasicParsing -TimeoutSec 15 | Out-Null } catch {}
