@@ -1,3 +1,37 @@
+name: Build and Deploy Tallysia
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 9.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build project (ignore warnings)
+        run: dotnet build ./EcommerceTelysia.csproj --configuration Release --no-restore
+
+      - name: Publish project
+        run: dotnet publish ./EcommerceTelysia.csproj --no-build --configuration Release --output ./publish
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: published-app
+          path: ./publish
+
   deploy:
     needs: build
     runs-on: self-hosted
@@ -12,12 +46,14 @@
         shell: powershell
         run: |
           $sitePath = "C:\inetpub\wwwroot\tallysiaenergy"
-          $pool     = "apppool-tallysiaenergy"    # <- yahan EXACT app pool name daalo
+          $pool     = "apppool-tallysiaenergy"    # <- IIS me jo actual naam hai wo daalo
+
           if (!(Test-Path $sitePath)) { New-Item -ItemType Directory -Path $sitePath | Out-Null }
           New-Item "$sitePath\app_offline.htm" -ItemType File -Force | Out-Null
 
           Import-Module WebAdministration
           Write-Host "Available app pools:"; (Get-ChildItem IIS:\AppPools | Select-Object name,state) | Format-Table -AutoSize
+
           if (Test-Path "IIS:\AppPools\$pool") {
             $state = (Get-WebAppPoolState -Name $pool).Value
             Write-Host "Current state of $pool: $state"
@@ -50,10 +86,12 @@
         run: |
           $pool = "apppool-tallysiaenergy"        # <- same name as above
           Import-Module WebAdministration
+
           if (Test-Path "IIS:\AppPools\$pool") {
             Start-WebAppPool -Name $pool
           } else {
             Write-Host "App pool '$pool' not found. Skipping start."
           }
+
           Remove-Item "C:\inetpub\wwwroot\tallysiaenergy\app_offline.htm" -Force -ErrorAction SilentlyContinue
           try { Invoke-WebRequest "http://localhost/" -UseBasicParsing -TimeoutSec 15 | Out-Null } catch {}
