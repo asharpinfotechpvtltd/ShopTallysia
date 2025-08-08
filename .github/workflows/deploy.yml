@@ -3,7 +3,8 @@ name: Build and Deploy Tallysia
 on:
   push:
     branches:
-      - main
+      - masterbranch     # <- tumhari branch
+  workflow_dispatch:  
 
 jobs:
   build:
