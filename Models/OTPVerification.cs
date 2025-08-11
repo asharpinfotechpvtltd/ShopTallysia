@@ -6,8 +6,8 @@ namespace EcommerceTelysia.Models
     {
         [Key]
         public int Id { get; set; }
-        public int Number { get; set; }
-        public string MobileNo { get; set; }
-        public DateTime Date { get; set; }
+        public int? Number { get; set; }
+        public string? MobileNo { get; set; }
+        public DateTime? Date { get; set; }
     }
 }
